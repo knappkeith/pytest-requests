@@ -1,4 +1,5 @@
 import requests
+from src.tools.stopwatch import Timer
 
 
 class TestingRequestSession(requests.Session):
@@ -27,9 +28,16 @@ class TestingRequestSession(requests.Session):
         # Build the correct URL
         url = self._build_url(url_path)
 
+        # Start the Timer
+        request_timer = Timer()
+
         # Send request to super
         response = TestingResponse(super().request(method=method.upper(),
                                                    url=url, *args, **kwargs))
+
+        # Add duration to repose object
+        request_timer.stop()
+        response.duration = request_timer.elapsed
 
         # Add to history
         self.history.append(response)
@@ -63,6 +71,9 @@ class TestingRequestSession(requests.Session):
 
     # Add the __str__ method to print out the history array
 
+    # Add method to handle the reauthentication if expires, will need
+    #  to add to _send_request as well.
+
 
 class TestingResponse(requests.Response):
     def __init__(self, req):
@@ -70,7 +81,23 @@ class TestingResponse(requests.Response):
         for k, v in req.__dict__.items():
             self.__dict__[k] = v
 
-    # Add the __str__ method to pretty print the response
+    def __str__(self):
+        if self.ok:
+            err_message = ""
+        else:
+            err_message = " [ERROR: {}]"
+            try:
+                err_message = err_message.format(
+                    self.json())
+            except Exception:
+                err_message = err_message.format(
+                    self.text[0:500])
+        return "[{duration}s]{method:>7}: {url} --> {stat}{err}".format(
+            duration=round(self.duration, 3),
+            method=self.request.method,
+            url=self.request.url,
+            stat=self.status_code,
+            err=err_message)
 
     # Add the generate_cURL method to print the curl version
 
@@ -103,3 +130,6 @@ class HistoryStack(list):
         '''
         while len(self) > self._max_length:
             self.pop(0)
+
+    def __str__(self):
+        return "\n".join([str(x) for x in self])
