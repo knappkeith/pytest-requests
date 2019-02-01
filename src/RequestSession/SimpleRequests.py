@@ -2,7 +2,19 @@ from src.RequestSession.TestRequests import TestingRequestSession
 
 
 class BasicRequestSession(TestingRequestSession):
+    """
+    This is a basic example of a Request Session.
+    Each different "connector" you would need would have
+    a different class.  You must have the `_build_url` method.
+    """
     def __init__(self, verify_SSL=True):
+        """This initailization method needs to initialize at least
+        the `base_url`.  You can also set anything on the `requests.Session`
+        that will be needed for this Object as well such as:
+        * `headers`
+        * `verify` - If the SSL Cert if verified
+        * `cookies`
+        """
         super().__init__()
 
         # Set whether to verify the SSL cert

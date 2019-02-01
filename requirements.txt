@@ -4,3 +4,4 @@ pytest-assume
 requests
 flake8
 arrow
+sphinx

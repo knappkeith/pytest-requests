@@ -1,6 +1,3 @@
-import json
-
-
 def test_get_users(basic_api):
     '''Test that the GET /users API returns a list of
     users and that the page length matches the users

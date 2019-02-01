@@ -76,6 +76,8 @@ class TestingRequestSession(requests.Session):
 
 
 class TestingResponse(requests.Response):
+    """Base Tesing Response Object, Monkey Patches the requests.Sessions.response Object.
+    """
     def __init__(self, req):
         super().__init__()
         for k, v in req.__dict__.items():
