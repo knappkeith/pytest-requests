@@ -101,7 +101,21 @@ class TestingResponse(requests.Response):
             stat=self.status_code,
             err=err_message)
 
-    # Add the generate_cURL method to print the curl version
+    @property
+    def cURL(self):
+        '''Returns the cURL equivalent of the passed request object
+        '''
+        req = self.request
+        command = "curl -X {method} {headers}{data}'{uri}'"
+        method = req.method
+        uri = req.url
+        if req.body != "":
+            data = " -d '{data}' ".format(data=req.body)
+        else:
+            data = ""
+        headers = " ".join(
+            ['-H "{0}: {1}"'.format(k, v) for k, v in req.headers.items()])
+        return command.format(method=method, headers=headers, data=data, uri=uri)
 
     # Add the printout method to print out the nice version
 
